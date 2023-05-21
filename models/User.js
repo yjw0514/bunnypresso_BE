@@ -15,6 +15,12 @@ const userSchema = mongoose.Schema({
     trim: true,
     minlength: 6,
   },
+  token: {
+    type: String,
+  },
+  tokenExp: {
+    type: Number,
+  },
 });
 
 //Mongoose pre 메소드는 save메소드 전에 실행된다.
@@ -45,6 +51,36 @@ userSchema.methods.comparePassword = function (plainPassword, callback) {
     if (err) return callback(err);
     callback(null, isMatch); //err는 null이고 isMatch 전달
   });
+};
+
+const SECRET_ACCESS = process.env.ACCESS_TOKEN_SECRET;
+const SECRET_REFRESH = process.env.REFRESH_TOKEN_SECRET;
+
+userSchema.methods.generateToken = async function (callback) {
+  const user = this;
+
+  //access token 생성
+  const accessToken = jwt.sign({ id: user._id.toHexString() }, SECRET_ACCESS, {
+    expiresIn: '1h',
+  });
+  //refresh token 생성
+  const refreshToken = jwt.sign(
+    { id: user._id.toHexString() },
+    SECRET_REFRESH,
+    {
+      expiresIn: '14d',
+    }
+  );
+
+  user.token = refreshToken;
+  await user
+    .save()
+    .then((user) => {
+      callback(null, { user, accessToken });
+    })
+    .catch((err) => {
+      if (err) return callback(err);
+    });
 };
 
 const User = mongoose.model('User', userSchema);

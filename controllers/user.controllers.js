@@ -13,9 +13,9 @@ exports.signup = async (req, res) => {
   try {
     let user = await User.findOne({ name });
     if (user) {
-      return res
-        .status(400)
-        .json({ errors: { message: '이미 존재하는 닉네임입니다.' } });
+      return res.status(400).json({
+        errors: { type: 'name', message: '이미 존재하는 닉네임입니다.' },
+      });
     }
 
     user = new User({
@@ -24,10 +24,12 @@ exports.signup = async (req, res) => {
     });
 
     //비밀번호 암호화 후에 save code 실행됨
-    user.save((err, userInfo) => {
-      if (err) return res.json({ success: false, err });
-      return res.status(200).json({ success: true });
-    });
+    await user
+      .save()
+      .then((userInfo) => {
+        return res.status(200).json({ success: true });
+      })
+      .catch((err) => res.json({ success: false, err }));
   } catch (err) {
     console.log(`Error ${err.message}`);
     res.status(400).send(err.message);
@@ -35,22 +37,80 @@ exports.signup = async (req, res) => {
 };
 
 exports.login = (req, res) => {
+  const { name, password } = req.body;
   //1. database에서 요청한 이메일 찾기
-  User.findOne({ name: req.body.name }, (err, user) => {
-    if (!user) {
-      return res.status(401).json({
-        loginSuccess: false,
-        message: '존재하지 않는 닉네임입니다.',
-      });
-    }
-    //2. 이메일이 있으면 비밀번호가 맞는지 확인
-    user.comparePassword(req.body.password, (err, isMatch) => {
-      if (!isMatch) {
+  User.findOne({ name })
+    .then((user) => {
+      if (!user) {
         return res.status(401).json({
           loginSuccess: false,
-          message: '비밀번호가 틀렸습니다.',
+          type: 'name',
+          message: '존재하지 않는 닉네임입니다.',
+        });
+      }
+      //2. 이름이 있으면 비밀번호가 맞는지 확인
+      user.comparePassword(password, (err, isMatch) => {
+        if (!isMatch) {
+          return res.status(401).json({
+            loginSuccess: false,
+            type: 'password',
+            message: '비밀번호가 틀렸습니다.',
+          });
+        }
+
+        //3. 비밀번호가 맞으면 token 생성
+        user.generateToken((err, data) => {
+          const { user, accessToken } = data;
+          if (err)
+            return res.status(400).json({ loginSuccess: false, message: err });
+
+          //쿠키에 토큰 저장
+          // 쿠키 저장 시 httponly:true 속성을 적용하면 클라이언트에서 쿠키 접근이 불가함
+          res.cookie('refreshToken', user.token);
+          res.cookie('accessToken', accessToken);
+          res.status(200).json({
+            loginSuccess: true,
+            userId: user._id,
+            accessToken,
+          });
+        });
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+//엑세스 토큰이 만료되었을 때 client쪽에서 엑세스 토큰 발급을 새로 요청할 때 실행.
+exports.refresh = async (req, res) => {
+  if (req.headers.authorization && req.cookies.token) {
+    const refreshToken = req.cookies.token;
+
+    User.findOne({ token: refreshToken }, (err, user) => {
+      if (!user) {
+        return res.status(403).json({
+          message: '권한이 없습니다.',
         });
       }
     });
-  });
+
+    //user 정보로 refreshtoken 검증
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+      if (err) res.status(401).json({ message: 'Refresh token expired.' });
+      const accessToken = jwt.sign(
+        { id: user._id.toHexString() },
+        SECRET_ACCESS,
+        {
+          expiresIn: '1h',
+        }
+      );
+      return res
+        .status(200)
+        .json({ accessToken, message: 'Access token이 발급되었습니다.' });
+    });
+  } else {
+    res
+      .staus(400)
+      .json({ message: 'Access token과 Refresh token이 필요합니다.' });
+  }
 };
