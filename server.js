@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const userRoutes = require('./routes/user');
+const menuRoutes = require('./routes/menu');
 
 const uri = process.env.ATLAS_URI;
 
@@ -32,5 +33,6 @@ app.listen(port, () => {
 });
 
 app.use('/', userRoutes);
+app.use('/menu', menuRoutes);
 
 //token verify 필요한 경우 적용하기
