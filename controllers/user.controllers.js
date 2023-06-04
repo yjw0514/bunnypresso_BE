@@ -63,7 +63,6 @@ exports.login = (req, res) => {
           const { user, accessToken } = data;
           if (err)
             return res.status(400).json({ loginSuccess: false, message: err });
-
           //쿠키에 토큰 저장
           // 쿠키 저장 시 httponly:true 속성을 적용하면 클라이언트에서 쿠키 접근이 불가함
           res.cookie('refreshToken', user.token);
@@ -83,34 +82,43 @@ exports.login = (req, res) => {
 
 //엑세스 토큰이 만료되었을 때 client쪽에서 엑세스 토큰 발급을 새로 요청할 때 실행.
 exports.refresh = async (req, res) => {
-  if (req.headers.authorization && req.cookies.token) {
-    const refreshToken = req.cookies.token;
-
-    User.findOne({ token: refreshToken }, (err, user) => {
-      if (!user) {
-        return res.status(403).json({
-          message: '권한이 없습니다.',
-        });
-      }
-    });
-
-    //user 정보로 refreshtoken 검증
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-      if (err) res.status(401).json({ message: 'Refresh token expired.' });
-      const accessToken = jwt.sign(
-        { id: user._id.toHexString() },
-        SECRET_ACCESS,
-        {
-          expiresIn: '1h',
+  const { refreshToken } = req.body;
+  if (req.headers.authorization && refreshToken) {
+    User.findOne({ token: refreshToken })
+      .then((user) => {
+        if (!user) {
+          return res.status(403).json({
+            message: '권한이 없습니다.',
+          });
         }
-      );
-      return res
-        .status(200)
-        .json({ accessToken, message: 'Access token이 발급되었습니다.' });
-    });
+
+        //user 정보로 refreshtoken 검증
+        jwt.verify(
+          refreshToken,
+          process.env.REFRESH_TOKEN_SECRET,
+          (err, user) => {
+            if (err) {
+              res.status(401).json({ message: 'Refresh token expired.' });
+            } else {
+              const accessToken = jwt.sign(
+                { id: user.id },
+                process.env.ACCESS_TOKEN_SECRET,
+                {
+                  expiresIn: '1h',
+                }
+              );
+              return res.status(200).json({
+                accessToken,
+                message: 'Access token이 발급되었습니다.',
+              });
+            }
+          }
+        );
+      })
+      .catch((err) => console.log(err));
   } else {
     res
-      .staus(400)
+      .status(400)
       .json({ message: 'Access token과 Refresh token이 필요합니다.' });
   }
 };
