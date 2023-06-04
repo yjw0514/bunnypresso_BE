@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const userRoutes = require('./routes/user');
 const menuRoutes = require('./routes/menu');
+const orderRoutes = require('./routes/order');
 
 const uri = process.env.ATLAS_URI;
 
@@ -34,5 +35,6 @@ app.listen(port, () => {
 
 app.use('/', userRoutes);
 app.use('/menu', menuRoutes);
+app.use('/order', orderRoutes);
 
 //token verify 필요한 경우 적용하기
