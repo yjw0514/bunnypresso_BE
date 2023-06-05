@@ -7,6 +7,7 @@ require('dotenv').config();
 const userRoutes = require('./routes/user');
 const menuRoutes = require('./routes/menu');
 const orderRoutes = require('./routes/order');
+const schedule = require('node-schedule');
 
 const uri = process.env.ATLAS_URI;
 
@@ -29,12 +30,19 @@ app.get('/', (req, res) => res.send('Hello World! 안녕하세요'));
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
-app.listen(port, () => {
-  console.log(`server is running on port ${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`server is running on port ${port}`);
+// });
 
 app.use('/', userRoutes);
 app.use('/menu', menuRoutes);
 app.use('/order', orderRoutes);
 
+app.listen(port, () => {
+  //매 5분마다 수행!
+  schedule.scheduleJob('0 0 0 * * *', function () {
+    console.log('스케줄러');
+    // 24시간 기준으로 주문번호 1로 리셋(ordernumbers 비우기)
+  });
+});
 //token verify 필요한 경우 적용하기
