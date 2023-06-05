@@ -15,7 +15,13 @@ const OrderListSchema = mongoose.Schema({
     type: Number,
   },
   createdAt: {
-    type: Date,
+    type: String,
+  },
+  img_url: {
+    type: String,
+  },
+  orderNum: {
+    type: Number,
   },
 });
 
