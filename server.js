@@ -38,11 +38,19 @@ app.use('/', userRoutes);
 app.use('/menu', menuRoutes);
 app.use('/order', orderRoutes);
 
+const moment = require('moment');
+const { OrderList } = require('./models/OrderList');
+
 app.listen(port, () => {
-  //매 5분마다 수행!
-  schedule.scheduleJob('0 0 0 * * *', function () {
-    console.log('스케줄러');
-    // 24시간 기준으로 주문번호 1로 리셋(ordernumbers 비우기)
+  schedule.scheduleJob('*/3 * * * *', async function () {
+    // 주문목록에 데이터가 있으면 3분마다 orderlist 하나씩 주문완료 처리(삭제)
+    const leftOrders = await OrderList.find();
+    if (leftOrders.length) {
+      const [first] = leftOrders;
+      const { _id } = first;
+      await OrderList.deleteOne(_id);
+      console.log('1분..', moment().format('YYYY-MM-DD HH:mm:ss'));
+    }
   });
 });
 //token verify 필요한 경우 적용하기
