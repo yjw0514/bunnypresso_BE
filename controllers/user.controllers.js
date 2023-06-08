@@ -81,44 +81,30 @@ exports.login = (req, res) => {
 };
 
 //엑세스 토큰이 만료되었을 때 client쪽에서 엑세스 토큰 발급을 새로 요청할 때 실행.
-exports.refresh = async (req, res) => {
+exports.verifyRefresh = async (req, res) => {
   const { refreshToken } = req.body;
   if (req.headers.authorization && refreshToken) {
-    User.findOne({ token: refreshToken })
-      .then((user) => {
-        if (!user) {
-          return res.status(403).json({
-            message: '권한이 없습니다.',
-          });
-        }
-
-        //user 정보로 refreshtoken 검증
-        jwt.verify(
-          refreshToken,
-          process.env.REFRESH_TOKEN_SECRET,
-          (err, user) => {
-            if (err) {
-              res.status(401).json({ message: 'Refresh token expired.' });
-            } else {
-              const accessToken = jwt.sign(
-                { id: user.id },
-                process.env.ACCESS_TOKEN_SECRET,
-                {
-                  expiresIn: '1h',
-                }
-              );
-              return res.status(200).json({
-                accessToken,
-                message: 'Access token이 발급되었습니다.',
-              });
-            }
+    //user 정보로 refreshtoken 검증
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+      if (err) {
+        res.status(401).json({
+          message: '인증 정보가 만료되었습니다. 다시 로그인해 주세요.',
+        });
+      } else {
+        const accessToken = jwt.sign(
+          { id: user.id },
+          process.env.ACCESS_TOKEN_SECRET,
+          {
+            expiresIn: '1h',
           }
         );
-      })
-      .catch((err) => console.log(err));
+        return res.status(200).json({
+          accessToken,
+          message: 'Access token이 발급되었습니다.',
+        });
+      }
+    });
   } else {
-    res
-      .status(400)
-      .json({ message: 'Access token과 Refresh token이 필요합니다.' });
+    res.status(400).json({ message: '다시 로그인해 주세요.' });
   }
 };

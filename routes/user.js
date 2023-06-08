@@ -25,5 +25,5 @@ router.post(
 router.post('/login', usersController.login);
 
 // 리프레쉬 토큰 체크
-router.post('/refresh', usersController.refresh);
+router.post('/refresh', usersController.verifyRefresh);
 module.exports = router;

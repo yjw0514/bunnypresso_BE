@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/order.controllers');
-const authJWT = require('../middleware/authJWT');
+const authCheck = require('../middleware/authCheck');
 
 // 메뉴 주문하기
-router.post('/', authJWT, orderController.takeOrder);
+router.post('/', authCheck, orderController.takeOrder);
 
 // 주문 목록 가져오기
-router.get('/list', authJWT, orderController.getOrderList);
+router.get('/list', authCheck, orderController.getOrderList);
 
 module.exports = router;
