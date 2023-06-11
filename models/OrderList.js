@@ -10,6 +10,7 @@ const OrderListSchema = mongoose.Schema({
   },
   isHot: {
     type: Boolean,
+    required: false,
   },
   count: {
     type: Number,
