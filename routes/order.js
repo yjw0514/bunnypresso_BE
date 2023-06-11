@@ -7,6 +7,6 @@ const authCheck = require('../middleware/authCheck');
 router.post('/', authCheck, orderController.takeOrder);
 
 // 주문 목록 가져오기
-router.get('/list', authCheck, orderController.getOrderList);
+router.get('/list', orderController.getOrderList);
 
 module.exports = router;
