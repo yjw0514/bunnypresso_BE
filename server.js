@@ -49,7 +49,7 @@ app.listen(port, () => {
       const [first] = leftOrders;
       const { _id } = first;
       await OrderList.deleteOne(_id);
-      console.log('1분..', moment().format('YYYY-MM-DD HH:mm:ss'));
+      console.log('3분..', moment().format('YYYY-MM-DD HH:mm:ss'));
     }
   });
 });
