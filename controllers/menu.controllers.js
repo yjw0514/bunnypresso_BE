@@ -1,11 +1,21 @@
 const { validationResult } = require('express-validator');
 const { Menu } = require('../models/Menu');
-const { OrderList } = require('../models/OrderList');
 
 // 메뉴 목록 가져오기
 exports.getMenu = async (req, res) => {
   try {
-    const menu = await Menu.find();
+    const { name } = req.query;
+    let menu = null;
+    if (name) {
+      // 메뉴 검색
+      menu = await Menu.find({
+        name: new RegExp(name, 'i'),
+      });
+    } else {
+      // 전체 매뉴
+      menu = await Menu.find();
+    }
+
     return res.status(200).json({
       menu,
     });
