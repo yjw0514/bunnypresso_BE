@@ -14,7 +14,7 @@ const authCheck = (req, res, next) => {
       }
     });
   } else {
-    res.status(401).json({ message: '권한이 없습니다.' });
+    res.status(401).json({ message: 'token expired' });
   }
 };
 
