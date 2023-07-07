@@ -55,4 +55,4 @@ app.listen(port, () => {
 });
 //token verify 필요한 경우 적용하기
 
-module.exports = app;
+// module.exports = app;
