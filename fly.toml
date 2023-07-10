@@ -1,9 +1,9 @@
-# fly.toml app configuration file generated for bunnypresso on 2023-06-18T15:51:13+09:00
+# fly.toml app configuration file generated for bunnypresso-be on 2023-07-10T11:23:38+09:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "bunnypresso"
+app = "bunnypresso-be"
 primary_region = "nrt"
 
 [http_service]

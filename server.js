@@ -4,9 +4,9 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 require('dotenv').config();
-const userRoutes = require('../routes/user');
-const menuRoutes = require('../routes/menu');
-const orderRoutes = require('../routes/order');
+const userRoutes = require('./routes/user');
+const menuRoutes = require('./routes/menu');
+const orderRoutes = require('./routes/order');
 const schedule = require('node-schedule');
 
 const uri = process.env.ATLAS_URI;
@@ -39,7 +39,7 @@ app.use('/menu', menuRoutes);
 app.use('/order', orderRoutes);
 
 const moment = require('moment');
-const { OrderList } = require('../models/OrderList');
+const { OrderList } = require('./models/OrderList');
 
 app.listen(port, () => {
   schedule.scheduleJob('*/3 * * * *', async function () {
@@ -53,6 +53,3 @@ app.listen(port, () => {
     }
   });
 });
-//token verify 필요한 경우 적용하기
-
-// module.exports = app;
