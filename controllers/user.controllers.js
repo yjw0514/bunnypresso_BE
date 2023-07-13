@@ -13,8 +13,10 @@ exports.signup = async (req, res) => {
   try {
     let user = await User.findOne({ name });
     if (user) {
-      return res.status(400).json({
-        errors: { type: 'name', message: '이미 존재하는 닉네임입니다.' },
+      return res.status(401).json({
+        success: false,
+        type: 'name',
+        message: '이미 존재하는 닉네임입니다.',
       });
     }
 
@@ -43,7 +45,7 @@ exports.login = (req, res) => {
     .then((user) => {
       if (!user) {
         return res.status(401).json({
-          loginSuccess: false,
+          success: false,
           type: 'name',
           message: '존재하지 않는 닉네임입니다.',
         });
@@ -72,6 +74,7 @@ exports.login = (req, res) => {
             loginSuccess: true,
             userId: user._id,
             accessToken,
+            refreshToken: user.token,
           });
         });
       });
