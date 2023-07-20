@@ -28,7 +28,12 @@ mongoose
 
 app.get('/', (req, res) => res.send('Hello World! 안녕하세요'));
 
-app.use(cors({ origin: true, credentials: true }));
+app.use(
+  cors({
+    origin: 'https://bunnypresso-fe.vercel.app',
+    credentials: true,
+  })
+);
 app.use(express.json());
 // app.listen(port, () => {
 //   console.log(`server is running on port ${port}`);
