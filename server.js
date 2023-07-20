@@ -30,7 +30,7 @@ app.get('/', (req, res) => res.send('Hello World! 안녕하세요'));
 
 app.use(
   cors({
-    origin: 'https://bunnypresso-fe.vercel.app',
+    origin: ['https://bunnypresso-fe.vercel.app', 'http://localhost:3000'],
     credentials: true,
   })
 );
@@ -47,14 +47,14 @@ const moment = require('moment');
 const { OrderList } = require('./models/OrderList');
 
 app.listen(port, () => {
-  schedule.scheduleJob('*/3 * * * *', async function () {
-    // 주문목록에 데이터가 있으면 3분마다 orderlist 하나씩 주문완료 처리(삭제)
+  schedule.scheduleJob('*/1 * * * *', async function () {
+    // 주문목록에 데이터가 있으면 1분마다 orderlist 하나씩 주문완료 처리(삭제)
     const leftOrders = await OrderList.find();
     if (leftOrders.length) {
       const [first] = leftOrders;
       const { _id } = first;
       await OrderList.deleteOne(_id);
-      console.log('3분..', moment().format('YYYY-MM-DD HH:mm:ss'));
+      console.log('1분..', moment().format('YYYY-MM-DD HH:mm:ss'));
     }
   });
 });
