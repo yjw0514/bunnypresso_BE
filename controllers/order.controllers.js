@@ -24,9 +24,9 @@ exports.takeOrder = async (req, res) => {
   if (todayOrderNum) {
     // 기존에 저장된 주문번호가 있으면 누적
     orderNum = todayOrderNum.orderNum + 1;
-    await new OrderHistory({ ...newOrder, newOrder }).save();
+    await new OrderHistory({ ...newOrder, orderNum }).save();
   } else {
-    await new OrderHistory({ ...newOrder, newOrder }).save();
+    await new OrderHistory({ ...newOrder, orderNum }).save();
   }
 
   // 2. 주문 내역 생성
