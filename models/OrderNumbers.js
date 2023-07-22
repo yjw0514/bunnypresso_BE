@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 //database 모델 생성
 const OrderNumberSchema = mongoose.Schema({
-  order: {
+  orderNum: {
     type: Number,
   },
   userId: {
