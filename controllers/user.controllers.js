@@ -2,6 +2,15 @@ const { validationResult } = require('express-validator');
 const { User } = require('../models/User');
 const jwt = require('jsonwebtoken');
 
+exports.updateProfile = async (req, res) => {
+  const user = await User.findById(req.userId);
+  user.name = req.body.name;
+  await user.save();
+  return res
+    .status(200)
+    .json({ message: '닉네임이 성공적으로 변경되었습니다.' });
+};
+
 exports.signup = async (req, res) => {
   //req에 에러 유무 확인
   const errors = validationResult(req);

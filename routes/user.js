@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
 const usersController = require('../controllers/user.controllers');
+const authCheck = require('../middleware/authCheck');
+
+// 개인정보 변경
+router.patch('/update-profile', authCheck, usersController.updateProfile);
 
 //회원가입
 router.post(
