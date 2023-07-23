@@ -18,18 +18,19 @@ exports.signup = async (req, res) => {
     return res.status(400).json({ message: errors.array() });
   }
 
-  const { name, password } = req.body;
+  const { email, name, password } = req.body;
   try {
-    let user = await User.findOne({ name });
+    let user = await User.findOne({ email });
     if (user) {
       return res.status(401).json({
         success: false,
-        type: 'name',
-        message: '이미 존재하는 닉네임입니다.',
+        type: 'email',
+        message: '이미 존재하는 이메일입니다.',
       });
     }
 
     user = new User({
+      email,
       name,
       password,
     });
@@ -48,15 +49,15 @@ exports.signup = async (req, res) => {
 };
 
 exports.login = (req, res) => {
-  const { name, password } = req.body;
+  const { email, name, password } = req.body;
   //1. database에서 요청한 이메일 찾기
-  User.findOne({ name })
+  User.findOne({ email })
     .then((user) => {
       if (!user) {
         return res.status(401).json({
           success: false,
-          type: 'name',
-          message: '존재하지 않는 닉네임입니다.',
+          type: 'email',
+          message: '존재하지 않는 이메일입니다.',
         });
       }
       //2. 이름이 있으면 비밀번호가 맞는지 확인
@@ -82,6 +83,7 @@ exports.login = (req, res) => {
           res.status(200).json({
             loginSuccess: true,
             userId: user._id,
+            name: user.name,
             accessToken,
             refreshToken: user.token,
           });

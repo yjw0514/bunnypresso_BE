@@ -11,6 +11,9 @@ router.patch('/update-profile', authCheck, usersController.updateProfile);
 router.post(
   '/signup',
   [
+    check('email', 'email is required')
+      .isEmail()
+      .withMessage('이메일 형식이 올바르지 않습니다.'),
     check('name', 'name is required')
       .isLength({ min: 2, max: 10 })
       .withMessage('이름은 2~10자리어야 합니다.')

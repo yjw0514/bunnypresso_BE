@@ -6,6 +6,9 @@ require('dotenv').config();
 
 //database 모델 생성
 const userSchema = mongoose.Schema({
+  email: {
+    type: String,
+  },
   name: {
     type: String,
     maxlength: 10,
