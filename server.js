@@ -30,7 +30,11 @@ app.get('/', (req, res) => res.send('Hello World! 안녕하세요'));
 
 app.use(
   cors({
-    origin: ['https://bunnypresso-fe.vercel.app', 'http://localhost:3000'],
+    origin: [
+      'https://bunnypresso-fe.vercel.app',
+      'https://bunnypresso-fe-git-dev-yjw0514.vercel.app',
+      'http://localhost:3000',
+    ],
     credentials: true,
   })
 );

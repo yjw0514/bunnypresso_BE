@@ -3,6 +3,19 @@ const { Menu } = require('../models/Menu');
 const { OrderList } = require('../models/OrderList');
 const { OrderHistory } = require('../models/OrderHistory');
 const moment = require('moment');
+const { User } = require('../models/User');
+
+// 나의 주문내역 가져오기
+exports.getMyOrderHistory = async (req, res) => {
+  console.log(req.userId);
+  try {
+    const orderHistoryList = await OrderHistory.find({ userId: req.userId });
+    console.log(orderHistoryList);
+    return res.status(200).json({ list: orderHistoryList });
+  } catch (err) {
+    console.log(err);
+  }
+};
 
 // 주문하기
 exports.takeOrder = async (req, res) => {
