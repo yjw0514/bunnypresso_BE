@@ -79,7 +79,6 @@ exports.login = (req, res) => {
           // 쿠키 저장 시 httponly:true 속성을 적용하면 클라이언트에서 쿠키 접근이 불가함
           res.cookie('refreshToken', user.token);
           res.cookie('accessToken', accessToken);
-          console.log(user.token);
           res.status(200).json({
             loginSuccess: true,
             userId: user._id,

@@ -7,10 +7,8 @@ const { User } = require('../models/User');
 
 // 나의 주문내역 가져오기
 exports.getMyOrderHistory = async (req, res) => {
-  console.log(req.userId);
   try {
     const orderHistoryList = await OrderHistory.find({ userId: req.userId });
-    console.log(orderHistoryList);
     return res.status(200).json({ list: orderHistoryList });
   } catch (err) {
     console.log(err);
