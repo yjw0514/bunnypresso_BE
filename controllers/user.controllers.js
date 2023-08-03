@@ -14,6 +14,16 @@ exports.updateProfile = async (req, res) => {
 exports.signup = async (req, res) => {
   //req에 에러 유무 확인
   const errors = validationResult(req);
+  // user router에서 validation에서 에러나는 경우 핸들링
+  if (errors) {
+    const [{ msg, path }] = errors.errors;
+    return res.status(401).json({
+      success: false,
+      type: path,
+      message: msg,
+    });
+  }
+
   if (!errors.isEmpty()) {
     return res.status(400).json({ message: errors.array() });
   }
@@ -49,7 +59,7 @@ exports.signup = async (req, res) => {
 };
 
 exports.login = (req, res) => {
-  const { email, name, password } = req.body;
+  const { email, password } = req.body;
   //1. database에서 요청한 이메일 찾기
   User.findOne({ email })
     .then((user) => {
@@ -60,7 +70,7 @@ exports.login = (req, res) => {
           message: '존재하지 않는 이메일입니다.',
         });
       }
-      //2. 이름이 있으면 비밀번호가 맞는지 확인
+      //2. 이메일이 있으면 비밀번호가 맞는지 확인
       user.comparePassword(password, (err, isMatch) => {
         if (!isMatch) {
           return res.status(401).json({
