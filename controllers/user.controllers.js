@@ -2,15 +2,7 @@ const { validationResult } = require('express-validator');
 const { User } = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-exports.updateProfile = async (req, res) => {
-  const user = await User.findById(req.userId);
-  user.name = req.body.name;
-  await user.save();
-  return res
-    .status(200)
-    .json({ message: '닉네임이 성공적으로 변경되었습니다.' });
-};
-
+// 회원가입
 exports.signup = async (req, res) => {
   //req에 에러 유무 확인
   const errors = validationResult(req);
@@ -58,6 +50,7 @@ exports.signup = async (req, res) => {
   }
 };
 
+// 로그인
 exports.login = (req, res) => {
   const { email, password } = req.body;
   //1. database에서 요청한 이메일 찾기
@@ -131,4 +124,14 @@ exports.verifyRefresh = async (req, res) => {
   } else {
     res.status(400).json({ message: '다시 로그인해 주세요.' });
   }
+};
+
+// 닉네임 변경
+exports.updateProfile = async (req, res) => {
+  console.log(req.body, req.file);
+  await User.updateOne(
+    { _id: req.userId },
+    { $set: req.file ? { file: req.file.path } : req.body }
+  );
+  return res.status(200).json({ message: '성공적으로 변경되었습니다.' });
 };

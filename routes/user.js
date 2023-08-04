@@ -1,11 +1,10 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
 const router = express.Router();
 const { check } = require('express-validator');
 const usersController = require('../controllers/user.controllers');
 const authCheck = require('../middleware/authCheck');
-
-// 개인정보 변경
-router.patch('/update-profile', authCheck, usersController.updateProfile);
 
 //회원가입
 router.post(
@@ -33,4 +32,26 @@ router.post('/login', usersController.login);
 
 // 리프레쉬 토큰 체크
 router.post('/refresh', usersController.verifyRefresh);
+
+// 프로필(이미지, 닉네임) 변경
+// 프로필 사진 업로드
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+      cb(null, new Date().valueOf() + path.extname(file.originalname));
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+const uploadMiddleware = upload.single('file');
+
+router.patch(
+  '/update-profile',
+  authCheck,
+  uploadMiddleware,
+  usersController.updateProfile
+);
 module.exports = router;

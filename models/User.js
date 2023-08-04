@@ -24,6 +24,9 @@ const userSchema = mongoose.Schema({
   tokenExp: {
     type: Number,
   },
+  file: {
+    type: String,
+  },
 });
 
 //Mongoose pre 메소드는 save메소드 전에 실행된다.
