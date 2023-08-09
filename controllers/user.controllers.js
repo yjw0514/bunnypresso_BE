@@ -126,12 +126,31 @@ exports.verifyRefresh = async (req, res) => {
   }
 };
 
-// 닉네임 변경
-exports.updateProfile = async (req, res) => {
-  console.log(req.body, req.file);
+// 프로필 닉네임 변경
+exports.updateProfileName = async (req, res) => {
+  await User.updateOne({ _id: req.userId }, { $set: req.body });
+  return res
+    .status(200)
+    .json({ message: '닉네임이 성공적으로 변경되었습니다.' });
+};
+
+// 프로필 사진 변경
+exports.updateProfileImg = async (req, res) => {
   await User.updateOne(
     { _id: req.userId },
-    { $set: req.file ? { file: req.file.path } : req.body }
+    { $set: { file: req.file ? req.file.path : null } }
   );
   return res.status(200).json({ message: '성공적으로 변경되었습니다.' });
+};
+
+// 프로필 사진 가져오기
+exports.getProfileImg = async (req, res) => {
+  const user = await User.findById(req.userId);
+
+  const url = req.protocol + '://' + req.get('host');
+  const filePath = user.file ? url + '/' + user.file : null;
+
+  return res
+    .status(200)
+    .json({ file: filePath, message: '성공적으로 가져왔습니다.' });
 };

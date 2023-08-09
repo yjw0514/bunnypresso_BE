@@ -33,7 +33,9 @@ router.post('/login', usersController.login);
 // 리프레쉬 토큰 체크
 router.post('/refresh', usersController.verifyRefresh);
 
-// 프로필(이미지, 닉네임) 변경
+// 프로필 닉네임 변경
+router.patch('/update-name', authCheck, usersController.updateProfileName);
+
 // 프로필 사진 업로드
 const upload = multer({
   storage: multer.diskStorage({
@@ -49,9 +51,12 @@ const upload = multer({
 const uploadMiddleware = upload.single('file');
 
 router.patch(
-  '/update-profile',
+  '/update-file',
   authCheck,
   uploadMiddleware,
-  usersController.updateProfile
+  usersController.updateProfileImg
 );
+
+router.get('/profile', authCheck, usersController.getProfileImg);
+
 module.exports = router;

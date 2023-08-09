@@ -39,13 +39,13 @@ app.use(
   })
 );
 app.use(express.json());
-// app.listen(port, () => {
-//   console.log(`server is running on port ${port}`);
-// });
 
 app.use('/', userRoutes);
 app.use('/menu', menuRoutes);
 app.use('/order', orderRoutes);
+
+// To serve static files
+app.use('/uploads', express.static('uploads'));
 
 const moment = require('moment');
 const { OrderList } = require('./models/OrderList');
