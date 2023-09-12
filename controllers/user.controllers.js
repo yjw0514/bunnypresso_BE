@@ -136,10 +136,10 @@ exports.updateProfileName = async (req, res) => {
 
 // 프로필 사진 변경
 exports.updateProfileImg = async (req, res) => {
-  await User.updateOne(
-    { _id: req.userId },
-    { $set: { file: req.file ? req.file.path : null } }
-  );
+  const file = req.body ? req.body.file : null;
+  console.log(file);
+
+  await User.updateOne({ _id: req.userId }, { $set: { file: file } });
   return res.status(200).json({ message: '성공적으로 변경되었습니다.' });
 };
 
@@ -147,10 +147,10 @@ exports.updateProfileImg = async (req, res) => {
 exports.getProfileImg = async (req, res) => {
   const user = await User.findById(req.userId);
 
-  const url = req.protocol + '://' + req.get('host');
-  const filePath = user.file ? url + '/' + user.file : null;
+  // const url = req.protocol + '://' + req.get('host');
+  // const filePath = user.file ? url + '/' + user.file : null;
 
   return res
     .status(200)
-    .json({ file: filePath, message: '성공적으로 가져왔습니다.' });
+    .json({ file: user.file ?? null, message: '성공적으로 가져왔습니다.' });
 };

@@ -37,25 +37,26 @@ router.post('/refresh', usersController.verifyRefresh);
 router.patch('/update-name', authCheck, usersController.updateProfileName);
 
 // 프로필 사진 업로드
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'uploads/');
-    },
-    filename: function (req, file, cb) {
-      cb(null, new Date().valueOf() + path.extname(file.originalname));
-    },
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 },
-});
-const uploadMiddleware = upload.single('file');
+// const upload = multer({
+//   storage: multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, 'uploads/');
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, new Date().valueOf() + path.extname(file.originalname));
+//     },
+//   }),
+//   limits: { fileSize: 5 * 1024 * 1024 },
+// });
+// const uploadMiddleware = upload.single('file');
 
-router.patch(
-  '/update-file',
-  authCheck,
-  uploadMiddleware,
-  usersController.updateProfileImg
-);
+// router.patch(
+//   '/update-file',
+//   authCheck,
+//   uploadMiddleware,
+//   usersController.updateProfileImg
+// );
+router.patch('/update-file', authCheck, usersController.updateProfileImg);
 
 router.get('/profile', authCheck, usersController.getProfileImg);
 
